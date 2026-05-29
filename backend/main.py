@@ -6,6 +6,7 @@ import os
 import shutil
 import pandas as pd
 
+from fastapi.responses import FileResponse
 from database import SessionLocal, Candidate
 from parser import parse_resume
 from analyzer import analyze_resumes
@@ -133,9 +134,11 @@ async def export_results(db: Session = Depends(get_db)):
     csv_path = "results.csv"
     df.to_csv(csv_path, index=False)
     
-    # In a real app, we'd return a FileResponse.
-    # Since we're in a sandbox, I'll just return a success message and path.
-    return {"message": "Results exported to results.csv", "path": csv_path}
+    return FileResponse(
+        path=csv_path,
+        filename="resume_screening_results.csv",
+        media_type="text/csv"
+    )
 
 @app.post("/clear")
 async def clear_data(db: Session = Depends(get_db)):
