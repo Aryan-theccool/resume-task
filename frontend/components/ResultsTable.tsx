@@ -34,13 +34,9 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      await api.exportResults();
-      alert('Results exported to results.csv on server (demo)');
-    } catch (error) {
-      alert('Export failed');
-    }
+  const handleExport = () => {
+    // Directly trigger the file download from the backend FileResponse
+    window.open('http://localhost:8000/export', '_blank');
   };
 
   const handleClear = async () => {
