@@ -57,85 +57,91 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4">
+    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden">
+      <div className="p-4 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-4 bg-slate-950/40">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input 
             type="text" 
             placeholder="Search by name or skill..." 
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-slate-950/60 border border-slate-850 rounded-xl outline-none text-slate-200 placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 text-sm transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button 
             onClick={loadCandidates}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
           >
             Refresh
           </button>
           <button 
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-green-400 bg-green-500/5 hover:bg-green-500/10 border border-green-500/20 rounded-lg transition-all"
           >
-            <Download className="w-4 h-4" /> Export CSV
+            <Download className="w-3.5 h-3.5" /> Export CSV
           </button>
           <button 
             onClick={handleClear}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 rounded-lg transition-all"
           >
-            <Trash2 className="w-4 h-4" /> Clear
+            <Trash2 className="w-3.5 h-3.5" /> Clear
           </button>
         </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50 text-gray-600 text-sm uppercase font-semibold">
+          <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase font-mono font-bold border-b border-slate-850">
             <tr>
-              <th className="px-6 py-4 border-b">Rank</th>
-              <th className="px-6 py-4 border-b">Candidate</th>
-              <th className="px-6 py-4 border-b">Score</th>
-              <th className="px-6 py-4 border-b">Matching Skills</th>
-              <th className="px-6 py-4 border-b">Missing Skills</th>
+              <th className="px-6 py-4">Rank</th>
+              <th className="px-6 py-4">Candidate</th>
+              <th className="px-6 py-4">Score</th>
+              <th className="px-6 py-4">Matching Skills</th>
+              <th className="px-6 py-4">Missing Skills</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-slate-850/60 text-sm">
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-gray-500">Loading...</td>
+                <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
+                  </div>
+                </td>
               </tr>
             ) : filteredCandidates.length > 0 ? (
               filteredCandidates.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 font-medium">#{c.rank}</td>
+                <tr key={c.id} className="hover:bg-slate-850/20 transition-colors">
+                  <td className="px-6 py-4 font-mono font-bold text-slate-400">#{c.rank}</td>
                   <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">{c.name}</div>
-                    <div className="text-xs text-gray-500">{c.filename}</div>
+                    <div className="font-bold text-slate-200">{c.name}</div>
+                    <div className="text-xs text-slate-500 font-mono mt-0.5">{c.filename}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                      c.score >= 60 ? 'bg-green-100 text-green-700' : 
-                      c.score >= 35 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold font-mono border ${
+                      c.score >= 60 ? 'bg-green-500/10 text-green-400 border-green-500/25' : 
+                      c.score >= 35 ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/25' : 'bg-red-500/10 text-red-400 border-red-500/25'
                     }`}>
                       {c.score}%
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 max-w-[280px]">
                       {c.matching_skills.map((s, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-medium">
+                        <span key={i} className="px-2 py-0.5 bg-blue-500/5 text-blue-400 border border-blue-500/15 rounded text-[10px] font-bold font-mono">
                           {s}
                         </span>
                       ))}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 max-w-[280px]">
                       {c.missing_skills.map((s, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-[10px] font-medium">
+                        <span key={i} className="px-2 py-0.5 bg-slate-950 text-slate-500 border border-slate-850 rounded text-[10px] font-bold font-mono">
                           {s}
                         </span>
                       ))}
@@ -145,7 +151,7 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
+                <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-sm">
                   No candidates found. Upload some resumes and analyze to see results.
                 </td>
               </tr>
