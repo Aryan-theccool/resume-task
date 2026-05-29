@@ -65,19 +65,48 @@ KNOWN_SKILLS = {
 }
 
 
+PRE_REPLACEMENTS = {
+    # Java/TS Script mappings
+    "java script": "javascript",
+    "type script": "typescript",
+    "react js": "reactjs",
+    "node js": "nodejs",
+    "vue js": "vuejs",
+    "next js": "nextjs",
+    "nuxt js": "nuxtjs",
+    "my sql": "mysql",
+    "postgre sql": "postgresql",
+    "git hub": "github",
+    "git lab": "gitlab",
+    "power shell": "powershell",
+    
+    # DSA mappings (longest first to avoid partial replacement)
+    "data structures & algorithms": "dsa",
+    "data structures and algorithms": "dsa",
+    "data structures": "dsa",
+    "data-structures": "dsa",
+    "algorithms": "dsa"
+}
+
+
 def normalize_text(text):
     """
     Normalize text for better skill matching.
-    PDF extraction often produces text like 'PythonDjango' with no spaces.
-    We insert spaces before capital letters to help split such tokens.
     """
     # Insert space between lowercase→uppercase transitions (camelCase splitting)
+    # This is necessary for PDFs that squash words together (e.g., "PythonDjango")
     text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
     # Replace common separators with spaces
     text = re.sub(r'[•·|/\\]', ' ', text)
     # Collapse multiple spaces/newlines
     text = re.sub(r'\s+', ' ', text)
-    return text.lower().strip()
+    text = text.lower().strip()
+    
+    # Unify synonyms and compound names before skill matching
+    for source, target in PRE_REPLACEMENTS.items():
+        text = text.replace(source, target)
+        
+    return text
 
 
 def extract_skills_from_text(text):
@@ -98,7 +127,7 @@ def extract_skills_from_text(text):
         "data engineering", "computer vision", "natural language processing",
         "react native", "ruby on rails", "spring boot", "google cloud",
         "power bi", "unit testing", "integration testing", "system design",
-        "data structures", "design patterns", "clean architecture",
+        "design patterns", "clean architecture",
         "functional programming", "generative ai", "artificial intelligence",
         "web development", "full stack", "frontend development", "backend development",
         "software engineering", "project management", "version control",
