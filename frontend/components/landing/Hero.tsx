@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { CheckCircle, Zap, Shield, BarChart3, FileText, Target } from 'lucide-react';
+import { Zap, Target } from 'lucide-react';
 
 export default function LandingHero({ onStart }: { onStart: () => void }) {
     return (
