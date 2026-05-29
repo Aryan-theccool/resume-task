@@ -13,7 +13,7 @@ interface Candidate {
   missing_skills: string[];
 }
 
-export default function ResultsTable({ refresh }: { refresh: () => void }) {
+export default function ResultsTable({ refresh, darkMode }: { refresh: () => void; darkMode: boolean }) {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,14 +57,26 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
   );
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden">
-      <div className="p-4 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-4 bg-slate-950/40">
+    <div className={`border transition-all duration-300 overflow-hidden rounded-2xl ${
+      darkMode 
+        ? 'bg-slate-900/60 border-slate-800/80 shadow-2xl backdrop-blur-md' 
+        : 'bg-white border-gray-200/80 shadow-md'
+    }`}>
+      <div className={`p-4 border-b flex flex-wrap items-center justify-between gap-4 transition-colors duration-300 ${
+        darkMode ? 'border-slate-800/80 bg-slate-950/40' : 'border-gray-250 bg-gray-50/50'
+      }`}>
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+            darkMode ? 'text-slate-500' : 'text-gray-400'
+          }`} />
           <input 
             type="text" 
             placeholder="Search by name or skill..." 
-            className="w-full pl-10 pr-4 py-2 bg-slate-950/60 border border-slate-850 rounded-xl outline-none text-slate-200 placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60 text-sm transition-all"
+            className={`w-full pl-10 pr-4 py-2 border rounded-xl outline-none text-sm transition-all ${
+              darkMode 
+                ? 'bg-slate-950/60 border-slate-850 text-slate-200 placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/60' 
+                : 'bg-white border-gray-200 text-slate-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500'
+            }`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -72,19 +84,31 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
         <div className="flex items-center gap-3">
           <button 
             onClick={loadCandidates}
-            className="px-4 py-2 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              darkMode 
+                ? 'text-slate-300 hover:text-white hover:bg-slate-800' 
+                : 'text-gray-600 hover:text-slate-950 hover:bg-gray-100'
+            }`}
           >
             Refresh
           </button>
           <button 
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-green-400 bg-green-500/5 hover:bg-green-500/10 border border-green-500/20 rounded-lg transition-all"
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold border rounded-lg transition-all ${
+              darkMode 
+                ? 'text-green-400 bg-green-500/5 hover:bg-green-500/10 border-green-500/20' 
+                : 'text-green-700 bg-green-50 hover:bg-green-100/50 border-green-200'
+            }`}
           >
             <Download className="w-3.5 h-3.5" /> Export CSV
           </button>
           <button 
             onClick={handleClear}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 rounded-lg transition-all"
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold border rounded-lg transition-all ${
+              darkMode 
+                ? 'text-red-400 bg-red-500/5 hover:bg-red-500/10 border-red-500/20' 
+                : 'text-red-700 bg-red-50 hover:bg-red-100/50 border-red-200'
+            }`}
           >
             <Trash2 className="w-3.5 h-3.5" /> Clear
           </button>
@@ -93,7 +117,9 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
 
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase font-mono font-bold border-b border-slate-850">
+          <thead className={`text-xs uppercase font-mono font-bold border-b transition-colors ${
+            darkMode ? 'bg-slate-950/60 text-slate-400 border-slate-850' : 'bg-gray-100 text-gray-500 border-gray-200'
+          }`}>
             <tr>
               <th className="px-6 py-4">Rank</th>
               <th className="px-6 py-4">Candidate</th>
@@ -102,7 +128,9 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
               <th className="px-6 py-4">Missing Skills</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-850/60 text-sm">
+          <tbody className={`divide-y text-sm transition-colors ${
+            darkMode ? 'divide-slate-850/60' : 'divide-gray-150'
+          }`}>
             {loading ? (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
@@ -115,11 +143,15 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
               </tr>
             ) : filteredCandidates.length > 0 ? (
               filteredCandidates.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-850/20 transition-colors">
-                  <td className="px-6 py-4 font-mono font-bold text-slate-400">#{c.rank}</td>
+                <tr key={c.id} className={`transition-colors ${
+                  darkMode ? 'hover:bg-slate-850/20' : 'hover:bg-gray-50/50'
+                }`}>
+                  <td className={`px-6 py-4 font-mono font-bold ${
+                    darkMode ? 'text-slate-400' : 'text-gray-500'
+                  }`}>#{c.rank}</td>
                   <td className="px-6 py-4">
-                    <div className="font-bold text-slate-200">{c.name}</div>
-                    <div className="text-xs text-slate-500 font-mono mt-0.5">{c.filename}</div>
+                    <div className={`font-bold ${darkMode ? 'text-slate-200' : 'text-gray-900'}`}>{c.name}</div>
+                    <div className={`text-xs font-mono mt-0.5 ${darkMode ? 'text-slate-500' : 'text-gray-400'}`}>{c.filename}</div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-bold font-mono border ${
@@ -132,7 +164,9 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1 max-w-[280px]">
                       {c.matching_skills.map((s, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-blue-500/5 text-blue-400 border border-blue-500/15 rounded text-[10px] font-bold font-mono">
+                        <span key={i} className={`px-2 py-0.5 border rounded text-[10px] font-bold font-mono transition-colors ${
+                          darkMode ? 'bg-blue-500/5 text-blue-400 border-blue-500/15' : 'bg-blue-50 text-blue-600 border-blue-100'
+                        }`}>
                           {s}
                         </span>
                       ))}
@@ -141,7 +175,9 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1 max-w-[280px]">
                       {c.missing_skills.map((s, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-slate-950 text-slate-500 border border-slate-850 rounded text-[10px] font-bold font-mono">
+                        <span key={i} className={`px-2 py-0.5 border rounded text-[10px] font-bold font-mono transition-colors ${
+                          darkMode ? 'bg-slate-950 text-slate-500 border-slate-850' : 'bg-gray-50 text-gray-400 border-gray-200'
+                        }`}>
                           {s}
                         </span>
                       ))}
@@ -151,7 +187,9 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-sm">
+                <td colSpan={5} className={`px-6 py-12 text-center text-sm transition-colors ${
+                  darkMode ? 'text-slate-500' : 'text-gray-400'
+                }`}>
                   No candidates found. Upload some resumes and analyze to see results.
                 </td>
               </tr>
