@@ -117,12 +117,17 @@ def normalize_text(text):
     return text
 
 
-def extract_skills_from_text(text):
-    """Extract known skills from text using the curated dictionary."""
+def extract_skills_from_text(text, custom_skills=None):
+    """Extract known skills from text using the curated dictionary and dynamic custom skills."""
     text = normalize_text(text)
     found_skills = set()
 
-    for skill in KNOWN_SKILLS:
+    # Combine curated KNOWN_SKILLS with dynamically requested custom skills
+    skills_to_search = KNOWN_SKILLS
+    if custom_skills:
+        skills_to_search = KNOWN_SKILLS.union(custom_skills)
+
+    for skill in skills_to_search:
         escaped = re.escape(skill)
         # Word-boundary equivalent that handles special chars like c++, c#, node.js
         pattern = r'(?<![a-z0-9])' + escaped + r'(?![a-z0-9])'
@@ -149,6 +154,41 @@ def extract_skills_from_text(text):
     return found_skills
 
 
+def extract_jd_skills(jd_text):
+    """
+    Extract skills from the Job Description.
+    Combines static dictionary matches with dynamic comma-separated custom items.
+    """
+    # 1. Base dictionary matching
+    jd_skills = extract_skills_from_text(jd_text)
+    
+    # 2. Extract dynamic custom skills if the JD contains commas (i.e. lists)
+    COMMON_STOP_WORDS = {
+        "and", "or", "the", "a", "an", "of", "to", "in", "for", "with", "on", "at", "by", 
+        "from", "about", "as", "into", "like", "through", "after", "before", "between", 
+        "under", "over", "within", "without", "during", "we", "are", "looking", "have", 
+        "has", "experience", "role", "candidate", "skills", "must", "should", "who", 
+        "work", "team", "strong", "knowledge", "good", "excellent", "ability", "years"
+    }
+    
+    if "," in jd_text:
+        parts = jd_text.split(",")
+        for part in parts:
+            cleaned = part.strip().lower()
+            words = cleaned.split()
+            # If it's a short phrase (1 to 3 words) and not composed entirely of stop words
+            if 0 < len(words) <= 3:
+                if not all(w in COMMON_STOP_WORDS for w in words):
+                    # Strip irrelevant punctuation but keep tech-friendly characters (+, #, -, .)
+                    skill_name = re.sub(r'[^\w\s\+\#\-\.]', '', cleaned).strip()
+                    if skill_name:
+                        # Normalize so PRE_REPLACEMENTS (like oops -> oop) run on it
+                        normalized = normalize_text(skill_name)
+                        jd_skills.add(normalized)
+                        
+    return jd_skills
+
+
 def compute_skill_score(jd_skills, resume_skills):
     """
     Compute a skill-based match score (0–100).
@@ -172,11 +212,12 @@ def analyze_resumes(jd_text, resumes_texts):
     tfidf_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])[0]
 
     # --- Skill-based matching ---
-    jd_skills = extract_skills_from_text(jd_text)
+    jd_skills = extract_jd_skills(jd_text)
 
     results = []
     for i, resume_text in enumerate(resumes_texts):
-        resume_skills = extract_skills_from_text(resume_text)
+        # Scan resume with the JD skills passed as custom allowed search items!
+        resume_skills = extract_skills_from_text(resume_text, custom_skills=jd_skills)
         matching = jd_skills.intersection(resume_skills)
         missing = jd_skills - resume_skills
 
