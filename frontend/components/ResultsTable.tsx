@@ -36,7 +36,8 @@ export default function ResultsTable({ refresh }: { refresh: () => void }) {
 
   const handleExport = () => {
     // Directly trigger the file download from the backend FileResponse
-    window.open('http://localhost:8000/export', '_blank');
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    window.open(`${apiBaseUrl}/export`, '_blank');
   };
 
   const handleClear = async () => {
