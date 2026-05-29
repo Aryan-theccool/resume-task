@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import UploadSection from '@/components/UploadSection';
 import ResultsTable from '@/components/ResultsTable';
 import LandingPage from '@/components/landing/page';
-import { ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function HomePage() {
   const [showScreener, setShowScreener] = useState(false);
