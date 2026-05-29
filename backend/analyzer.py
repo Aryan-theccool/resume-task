@@ -85,7 +85,15 @@ PRE_REPLACEMENTS = {
     "data structures and algorithms": "dsa",
     "data structures": "dsa",
     "data-structures": "dsa",
-    "algorithms": "dsa"
+    "algorithms": "dsa",
+    
+    # OOP/OOPs mappings (longest first to avoid partial replacement)
+    "object-oriented programming": "oop",
+    "object oriented programming": "oop",
+    "oops concepts": "oop",
+    "oops concept": "oop",
+    "oop's": "oop",
+    "oops": "oop"
 }
 
 
